@@ -1,0 +1,31 @@
+{
+  "name": "@ilb/testdataparser",
+  "version": "1.0.0",
+  "description": "testdataparser for javascript",
+  "type": "module",
+  "main": "src/index.js",
+  "files": [
+    "src"
+  ],
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "eslint": "^8.4.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-jest": "^25.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "jest": "^27.4.5",
+    "prettier": "^2.5.1"
+  },
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ilb/testdataparser.git"
+  },
+  "author": "",
+  "license": "ISC"
+}
