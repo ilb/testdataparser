@@ -5,18 +5,18 @@ export default class TestDataParser {
     this.workbook = xlsx.readFile(path, { cellDates: true });
   }
   parseAllSheets() {
-    const result = new Map();
+    const result = {};
     this.workbook.SheetNames.forEach((sheetName) => {
-      result.set(sheetName, this.parseSheet(sheetName));
+      result[sheetName] = this.parseSheet(sheetName);
     });
     return result;
   }
   parseSheet(sheetName) {
     const sheet = this.workbook.Sheets[sheetName];
     const blocks = parseBlockNames(sheet);
-    const result = new Map();
+    const result = {};
     blocks.forEach((line, blockName) => {
-      result.set(blockName, this.parseBlock(sheetName, line + 2, blockName.startsWith('#')));
+      result[blockName] = this.parseBlock(sheetName, line + 2, blockName.startsWith('#'));
     });
     return result;
   }
@@ -27,9 +27,9 @@ export default class TestDataParser {
   /**Распарсить вертикальный блок */
   parseArrayBlock(sheetName, line) {
     const sheet = this.workbook.Sheets[sheetName];
-    const result = new Map();
+    const result = {};
     while (sheet['A' + line]) {
-      result.set(sheet['A' + line].w, sheet['B' + line].v);
+      result[sheet['A' + line].w] = getCellValue(sheet['B' + line]);
       line++;
     }
     return result;
@@ -41,7 +41,7 @@ export default class TestDataParser {
     let row = this.parseTableRow(sheetName, ++line);
     while (row.length) {
       const map = new Map(header.map((colName, i) => [colName, row[i]]));
-      result.push(map);
+      result.push(Object.fromEntries(map));
       row = this.parseTableRow(sheetName, ++line);
     }
     return result;
@@ -51,13 +51,24 @@ export default class TestDataParser {
     const row = [];
     let char = 'A';
     while (sheet[char + line]) {
-      row.push(sheet[char + line].v);
+      row.push(getCellValue(sheet[char + line]));
       char = String.fromCharCode(char.charCodeAt() + 1); // A->B->C ...
     }
     return row;
   }
 }
 
+/**
+ * Получить значение ячейки
+ * @param {*} cell
+ */
+function getCellValue(cell) {
+  // глюк? сдвоенные ячейки (две даты равны в соседних ячейках) во второй ячейке выводятся строкой
+  if (cell.t == 'd' && !(cell.v instanceof Date)) {
+    return new Date(cell.v);
+  }
+  return cell.v;
+}
 /**
  * поиск блоков имя блока=>номер строки
  * {
